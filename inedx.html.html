@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AM Workout">
+<title>AM Workout</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080a0f;
+    --surface: #0e1118;
+    --border: rgba(255,255,255,0.06);
+    --accent: #c8f135;
+    --accent2: #35c8f1;
+    --red: #f13535;
+    --text: #e8eaf0;
+    --muted: #5a6070;
+    --card: #12151e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    min-height: 100dvh;
+  }
+
+  /* Animated background */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(200,241,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,241,53,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-glow {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,241,53,0.06) 0%, transparent 70%);
+    top: -100px;
+    right: -100px;
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 20px 16px 32px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 8px;
+    animation: slide-down 0.5s ease both;
+  }
+
+  .greeting {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .greeting span {
+    color: var(--accent);
+  }
+
+  .live-time {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  /* Race countdown */
+  .race-banner {
+    background: linear-gradient(135deg, #0e1a00, #131f04);
+    border: 1px solid rgba(200,241,53,0.2);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slide-down 0.5s 0.1s ease both;
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .race-banner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .race-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .race-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .race-countdown {
+    text-align: right;
+  }
+
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .countdown-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Today's workout */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding-left: 2px;
+    animation: slide-down 0.5s 0.15s ease both;
+    opacity: 0;
+  }
+
+  .workout-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    animation: slide-up 0.5s 0.2s ease both;
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .workout-card.run {
+    border-color: rgba(200,241,53,0.15);
+  }
+
+  .workout-card.elliptical {
+    border-color: rgba(53,200,241,0.15);
+  }
+
+  .workout-card.rest {
+    border-color: rgba(90,96,112,0.2);
+  }
+
+  .workout-type {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .workout-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .run .workout-icon { background: rgba(200,241,53,0.1); }
+  .elliptical .workout-icon { background: rgba(53,200,241,0.1); }
+  .rest .workout-icon { background: rgba(90,96,112,0.1); }
+
+  .workout-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .run .workout-title { color: var(--accent); }
+  .elliptical .workout-title { color: var(--accent2); }
+  .rest .workout-title { color: var(--muted); }
+
+  .workout-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .workout-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .stat-box {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .run .stat-value { color: var(--accent); }
+  .elliptical .stat-value { color: var(--accent2); }
+
+  .stat-unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* Instructions */
+  .instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .instruction-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: #8a909e;
+    line-height: 1.4;
+  }
+
+  .instruction-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .run .instruction-dot { background: var(--accent); }
+  .elliptical .instruction-dot { background: var(--accent2); }
+
+  /* HR zone bar */
+  .hr-zone {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .hr-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .hr-bar-wrap {
+    position: relative;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .hr-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+
+  .run .hr-bar-fill { background: linear-gradient(90deg, #91b520, var(--accent)); }
+  .elliptical .hr-bar-fill { background: linear-gradient(90deg, #1580b5, var(--accent2)); }
+
+  .hr-range {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  /* Week strip */
+  .week-strip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    animation: slide-up 0.5s 0.3s ease both;
+    opacity: 0;
+  }
+
+  .week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .day-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .day-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+  }
+
+  .day-dot.run { background: rgba(200,241,53,0.1); border-color: rgba(200,241,53,0.2); }
+  .day-dot.elliptical { background: rgba(53,200,241,0.1); border-color: rgba(53,200,241,0.2); }
+  .day-dot.today { box-shadow: 0 0 0 2px var(--accent); }
+  .day-dot.today.elliptical { box-shadow: 0 0 0 2px var(--accent2); }
+
+  /* Motivational */
+  .motto {
+    text-align: center;
+    padding: 8px 0 4px;
+    animation: fade-in 0.5s 0.5s ease both;
+    opacity: 0;
+  }
+
+  .motto-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .motto-text span {
+    color: var(--accent);
+  }
+
+  /* Animations */
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Rest day */
+  .rest-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .rest-message .big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--muted);
+    display: block;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="greeting">Buenos días, <span>Jorge</span></div>
+      <div style="font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; margin-top:2px;" id="today-date"></div>
+    </div>
+    <div class="live-time" id="live-time"></div>
+  </div>
+
+  <!-- Race countdown -->
+  <div class="race-banner">
+    <div>
+      <div class="race-label">🏁 Meta</div>
+      <div class="race-name">Mini Quito 5K</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;">Parque Bicentenario</div>
+    </div>
+    <div class="race-countdown">
+      <div class="countdown-num" id="days-countdown">—</div>
+      <div class="countdown-label">días</div>
+    </div>
+  </div>
+
+  <!-- Today's workout -->
+  <div class="section-label">Sesión de hoy</div>
+  <div id="workout-card"></div>
+
+  <!-- Week strip -->
+  <div class="week-strip">
+    <div class="section-label" style="animation:none;opacity:1;">Esta semana</div>
+    <div class="week-days" id="week-strip"></div>
+  </div>
+
+  <!-- Motto -->
+  <div class="motto">
+    <div class="motto-text" id="daily-motto"></div>
+  </div>
+
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────
+  const RACE_DATE = new Date('2026-06-06T07:00:00-05:00');
+
+  // Schedule: keyed by day of week (0=Sun,1=Mon,...6=Sat)
+  // and specific dates override day-of-week
+  const DATE_SCHEDULE = {
+    '2026-05-17': { type: 'elliptical', label: 'Elíptica', time: '6:30 PM', duration: 30 },
+    '2026-05-18': [
+      { type: 'run', label: 'Zona 2 Fácil', time: '5:00 AM', km: 6, pace: '8:00', hr: '120–145' },
+      { type: 'elliptical', label: 'Elíptica Noche', time: '7:00 PM', duration: 35 }
+    ],
+    '2026-05-19': { type: 'elliptical', label: 'Elíptica', time: '5:00 AM', duration: 35 },
+    '2026-05-20': { type: 'run', label: 'Intervalos VO2max', time: '5:00 AM', km: 7, pace: '6:28', hr: '163+', intervals: '5×4 min' },
+    '2026-05-21': { type: 'elliptical', label: 'Elíptica', time: '5:00 AM', duration: 35 },
+    '2026-05-23': { type: 'run', label: 'Long Run Fácil', time: '5:00 AM', km: 8, pace: '7:45', hr: '120–145' },
+    '2026-05-24': { type: 'run', label: 'Recuperación', time: '5:00 AM', km: 4, pace: '8:15', hr: '120–135' },
+    '2026-05-25': [
+      { type: 'run', label: 'Zona 2 Fácil', time: '5:00 AM', km: 6, pace: '8:00', hr: '120–145' },
+      { type: 'elliptical', label: 'Elíptica Noche', time: '7:00 PM', duration: 35 }
+    ],
+    '2026-05-26': { type: 'elliptical', label: 'Elíptica', time: '5:00 AM', duration: 35 },
+    '2026-05-27': { type: 'run', label: 'Intervalos VO2max', time: '5:00 AM', km: 7, pace: '6:28', hr: '163+', intervals: '5×4 min' },
+    '2026-05-28': { type: 'elliptical', label: 'Elíptica', time: '5:00 AM', duration: 35 },
+    '2026-05-30': { type: 'run', label: 'Long Run Fácil', time: '5:00 AM', km: 8, pace: '7:45', hr: '120–145' },
+    '2026-05-31': { type: 'run', label: 'Recuperación', time: '5:00 AM', km: 4, pace: '8:15', hr: '120–135' },
+    '2026-06-06': { type: 'race', label: '🏁 MINI QUITO 5K', time: '7:00 AM' },
+  };
+
+  const MOTTOS = [
+    'Zona 2 hoy. <span>VO2max</span> mañana.',
+    'Lento en el fácil. <span>Fuerte</span> en el duro.',
+    'Consistencia > <span>Intensidad</span>.',
+    'El descanso es <span>parte</span> del entrenamiento.',
+    'Un run a la vez. <span>#beatyesterday</span>',
+    'HR bajo. Base <span>sólida</span>.',
+    'No te adelantes. <span>Confía</span> en el proceso.',
+  ];
+
+  // ── Helpers ──────────────────────────────────────────────
+  function toDateKey(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth()+1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0');
+  }
+
+  function daysUntil(target) {
+    const now = new Date();
+    const diff = target - new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.ceil(diff / (1000*60*60*24));
+  }
+
+  function formatDate(d) {
+    const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+  }
+
+  // ── Clock ────────────────────────────────────────────────
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('live-time').textContent = h + ':' + m;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // ── Date ─────────────────────────────────────────────────
+  const today = new Date();
+  document.getElementById('today-date').textContent = formatDate(today);
+
+  // ── Countdown ────────────────────────────────────────────
+  document.getElementById('days-countdown').textContent = daysUntil(RACE_DATE);
+
+  // ── Workout card ─────────────────────────────────────────
+  function buildRunCard(s, multi) {
+    const isInterval = s.label.includes('Intervalo');
+    const hrPct = isInterval ? 90 : 60;
+    const instructions = isInterval
+      ? ['10 min calentamiento suave', `${s.intervals} FUERTE @ ~${s.pace}/km`, '3 min recuperación entre cada uno', '10 min enfriamiento']
+      : [`Ritmo objetivo: ${s.pace}/km`, `HR máximo: ${s.hr} ppm`, 'Respiración conversacional', 'Más lento de lo que crees necesario'];
+
+    return `
+      <div class="workout-card run" style="${multi ? 'margin-bottom:10px;' : ''}">
+        <div class="workout-type">
+          <div class="workout-icon">🏃</div>
+          <div>
+            <div class="workout-title">${s.label}</div>
+            <div class="workout-subtitle">${s.time}</div>
+          </div>
+        </div>
+        <div class="workout-stats">
+          <div class="stat-box">
+            <div class="stat-value run">${s.km}</div>
+            <div class="stat-unit">km</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value run">${s.pace}</div>
+            <div class="stat-unit">min/km</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value run">${isInterval ? 'Z4' : 'Z2'}</div>
+            <div class="stat-unit">zona HR</div>
+          </div>
+        </div>
+        <div class="instructions">
+          ${instructions.map(i => `<div class="instruction-row run"><div class="instruction-dot run"></div><span>${i}</span></div>`).join('')}
+        </div>
+        <div class="hr-zone">
+          <div class="hr-label">HR objetivo: ${s.hr} ppm</div>
+          <div class="hr-bar-wrap"><div class="hr-bar-fill run" style="width:${hrPct}%"></div></div>
+          <div class="hr-range"><span>100</span><span>190</span></div>
+        </div>
+      </div>`;
+  }
+
+  function buildEllipticalCard(s, multi) {
+    return `
+      <div class="workout-card elliptical" style="${multi ? 'margin-bottom:10px;' : ''}">
+        <div class="workout-type">
+          <div class="workout-icon">🔵</div>
+          <div>
+            <div class="workout-title">${s.label}</div>
+            <div class="workout-subtitle">${s.time}</div>
+          </div>
+        </div>
+        <div class="workout-stats">
+          <div class="stat-box">
+            <div class="stat-value elliptical">${s.duration}</div>
+            <div class="stat-unit">minutos</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value elliptical">Z2</div>
+            <div class="stat-unit">zona HR</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value elliptical">145</div>
+            <div class="stat-unit">HR máx</div>
+          </div>
+        </div>
+        <div class="instructions">
+          ${['Ritmo constante y controlado','HR objetivo: 120–145 ppm','Baja resistencia si HR sube de 145','Respiración conversacional todo el tiempo']
+            .map(i => `<div class="instruction-row elliptical"><div class="instruction-dot elliptical"></div><span>${i}</span></div>`).join('')}
+        </div>
+        <div class="hr-zone">
+          <div class="hr-label">HR objetivo: 120–145 ppm</div>
+          <div class="hr-bar-wrap"><div class="hr-bar-fill elliptical" style="width:55%"></div></div>
+          <div class="hr-range"><span>100</span><span>190</span></div>
+        </div>
+      </div>`;
+  }
+
+  function renderWorkout() {
+    const key = toDateKey(today);
+    const schedule = DATE_SCHEDULE[key];
+    const el = document.getElementById('workout-card');
+
+    if (!schedule) {
+      el.innerHTML = `<div class="workout-card rest"><div class="rest-message"><span class="big">DESCANSO</span>Recuperación activa. Camina, estira, hidratate.<br>El cuerpo crece cuando descansa.</div></div>`;
+      return;
+    }
+
+    const sessions = Array.isArray(schedule) ? schedule : [schedule];
+    const multi = sessions.length > 1;
+    let html = '';
+
+    sessions.forEach(s => {
+      if (s.type === 'run') html += buildRunCard(s, multi);
+      else if (s.type === 'elliptical') html += buildEllipticalCard(s, multi);
+      else if (s.type === 'race') {
+        html += `<div class="workout-card run"><div class="rest-message"><span class="big" style="color:var(--accent)">🏁 RACE DAY</span>Mini Quito 5K — Parque Bicentenario<br>Salida conservadora. Déjalo todo en el km 4.</div></div>`;
+      }
+    });
+
+    el.innerHTML = html;
+  }
+
+  renderWorkout();
+
+  // ── Week strip ───────────────────────────────────────────
+  function renderWeek() {
+    const dayNames = ['D','L','M','X','J','V','S'];
+    const dayIcons = { run: '🏃', elliptical: '🔵', race: '🏁' };
+
+    // Get Monday of current week
+    const monday = new Date(today);
+    const dow = today.getDay();
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const key = toDateKey(d);
+      const isToday = key === toDateKey(today);
+      const sched = DATE_SCHEDULE[key];
+
+      let type = 'rest';
+      let icon = '·';
+      if (sched) {
+        const sessions = Array.isArray(sched) ? sched : [sched];
+        type = sessions[0].type;
+        // if both run and elliptical, show run
+        const hasRun = sessions.some(s => s.type === 'run');
+        type = hasRun ? 'run' : sessions[0].type;
+        icon = dayIcons[type] || '·';
+      }
+
+      html += `
+        <div class="day-cell">
+          <div class="day-name">${dayNames[d.getDay()]}</div>
+          <div class="day-dot ${type} ${isToday ? 'today' : ''}">${icon}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted)">${d.getDate()}</div>
+        </div>`;
+    }
+
+    document.getElementById('week-strip').innerHTML = html;
+  }
+
+  renderWeek();
+
+  // ── Motto ────────────────────────────────────────────────
+  const mottoEl = document.getElementById('daily-motto');
+  mottoEl.innerHTML = MOTTOS[today.getDay() % MOTTOS.length];
+
+</script>
+</body>
+</html>
