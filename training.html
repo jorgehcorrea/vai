@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Progresión — VAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080a0f; --surface: #0e1118;
+    --border: rgba(255,255,255,0.06);
+    --accent: #c8f135; --accent2: #35c8f1;
+    --red: #f13535; --yellow: #f1c135;
+    --text: #e8eaf0; --muted: #5a6070; --card: #12151e;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; background:var(--bg); color:var(--text);
+    font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+  body { padding:env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left); min-height:100dvh; }
+
+  .bg-grid { position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: linear-gradient(rgba(200,241,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,241,53,0.03) 1px, transparent 1px);
+    background-size:40px 40px; }
+  .bg-glow { position:fixed; width:400px; height:400px; border-radius:50%;
+    background:radial-gradient(circle, rgba(200,241,53,0.06) 0%, transparent 70%);
+    top:-100px; right:-100px; pointer-events:none; z-index:0;
+    animation:pulse-glow 4s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+
+  .container { position:relative; z-index:1; max-width:420px; margin:0 auto;
+    padding:20px 16px 40px; display:flex; flex-direction:column; gap:12px; }
+
+  /* ── Header ── */
+  .header { display:flex; align-items:center; gap:12px; padding-top:8px;
+    animation:slide-down .4s ease both; }
+  .back-btn { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.1em;
+    color:var(--muted); text-decoration:none; padding:6px 10px; border-radius:8px;
+    border:1px solid var(--border); white-space:nowrap;
+    transition:color .15s,border-color .15s; }
+  .back-btn:hover { color:var(--accent); border-color:rgba(200,241,53,.3); }
+  .page-title { font-family:'Bebas Neue',sans-serif; font-size:30px;
+    letter-spacing:.05em; line-height:1; }
+  .page-sub { font-family:'DM Mono',monospace; font-size:10px;
+    color:var(--muted); letter-spacing:.1em; margin-top:1px; }
+
+  /* ── Section label ── */
+  .section-label { font-family:'DM Mono',monospace; font-size:10px;
+    letter-spacing:.15em; color:var(--muted); text-transform:uppercase;
+    padding-left:2px; animation:slide-down .4s .08s ease both; opacity:0; }
+
+  /* ── Base card ── */
+  .card { background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:18px 16px;
+    animation:slide-up .4s .12s ease both; opacity:0; }
+
+  /* ── Progression summary ── */
+  .prog-row { display:flex; justify-content:space-between;
+    align-items:flex-start; margin-bottom:14px; }
+  .prog-km { font-family:'Bebas Neue',sans-serif; font-size:52px;
+    color:var(--accent); line-height:1; letter-spacing:.02em; }
+  .prog-km-unit { font-family:'DM Mono',monospace; font-size:13px;
+    color:var(--muted); margin-left:2px; }
+  .prog-sublabel { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin-top:3px; }
+  .delta-badge { display:inline-flex; align-items:center; padding:5px 12px;
+    border-radius:20px; font-family:'Bebas Neue',sans-serif;
+    font-size:24px; letter-spacing:.04em; }
+  .delta-badge.on-target { background:rgba(200,241,53,.12); color:var(--accent); }
+  .delta-badge.under     { background:rgba(241,193,53,.12); color:var(--yellow); }
+  .delta-badge.over      { background:rgba(241,53,53,.12);  color:var(--red); }
+  .delta-badge.down      { background:rgba(90,96,112,.15);  color:var(--muted); }
+  .target-band { font-family:'DM Mono',monospace; font-size:10px;
+    color:var(--muted); letter-spacing:.04em; margin-top:10px;
+    padding:8px 10px; border-radius:8px;
+    background:rgba(255,255,255,.03); border:1px solid var(--border); }
+  .target-band .hl { color:var(--accent); }
+  .prior-row { display:flex; justify-content:space-between; align-items:center;
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+  .prior-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); }
+  .prior-val { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--muted); }
+  .prior-unit { font-family:'DM Mono',monospace; font-size:9px;
+    color:var(--muted); margin-left:2px; }
+
+  /* ── 2-week day grid ── */
+  .week-block { padding:10px 0; }
+  .week-block + .week-block { border-top:1px solid var(--border);
+    padding-top:14px; margin-top:4px; }
+  .week-block-hdr { display:flex; justify-content:space-between;
+    align-items:baseline; margin-bottom:10px; }
+  .wk-label { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
+  .wk-total { font-family:'Bebas Neue',sans-serif; font-size:22px;
+    color:var(--text); letter-spacing:.04em; }
+  .wk-total-unit { font-family:'DM Mono',monospace; font-size:10px;
+    color:var(--muted); margin-left:2px; }
+  .days-row { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+  .day-col { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .day-name { font-family:'DM Mono',monospace; font-size:8px;
+    letter-spacing:.04em; color:var(--muted); text-transform:uppercase; }
+  .bar-track { height:44px; width:100%; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .bar-fill { width:9px; border-radius:3px 3px 0 0; }
+  .bar-fill.run  { background:var(--accent); }
+  .bar-fill.zero { background:var(--border); height:2px; border-radius:2px; }
+  .day-val { font-family:'DM Mono',monospace; font-size:8px; color:var(--text); }
+  .day-val.zero { color:var(--muted); }
+
+  /* ── Readiness ── */
+  .readiness-grid { display:grid; grid-template-columns:repeat(2,1fr);
+    gap:10px; animation:slide-up .4s .2s ease both; opacity:0; }
+  .r-card { background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:14px 14px 12px;
+    display:flex; flex-direction:column; gap:3px; }
+  .r-icon { font-size:15px; line-height:1; margin-bottom:3px; }
+  .r-val { font-family:'Bebas Neue',sans-serif; font-size:28px;
+    letter-spacing:.03em; line-height:1; color:var(--text); }
+  .r-label { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.1em; color:var(--muted); text-transform:uppercase; margin-top:3px; }
+  .r-delta { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.03em; }
+  .r-delta.good { color:var(--accent); }
+  .r-delta.bad  { color:var(--red); }
+  .r-delta.flat { color:var(--muted); }
+
+  /* ── Recommendation ── */
+  .rec-card { background:linear-gradient(135deg,#0e1a00,#131f04);
+    border:1px solid rgba(200,241,53,.2); border-radius:16px;
+    padding:14px 16px; position:relative; overflow:hidden;
+    animation:slide-up .4s .28s ease both; opacity:0; }
+  .rec-card::before { content:''; position:absolute; left:0; top:0; bottom:0;
+    width:3px; background:var(--accent); border-radius:3px 0 0 3px; }
+  .rec-eyebrow { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.15em; color:var(--accent); text-transform:uppercase;
+    margin-bottom:6px; }
+  .rec-text { font-size:13px; color:var(--text); line-height:1.55; }
+  .rec-text .hl { color:var(--accent); font-weight:600; }
+  .rec-dots { display:flex; gap:5px; margin-top:10px; }
+  .rec-dot { width:6px; height:6px; border-radius:50%;
+    background:rgba(200,241,53,.25); }
+  .rec-dot.on { background:var(--accent); }
+
+  /* ── Utility ── */
+  .no-data { font-family:'DM Mono',monospace; font-size:11px;
+    color:var(--muted); text-align:center; padding:22px 0; }
+  @keyframes slide-down { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes slide-up   { from{opacity:0;transform:translateY(10px)}  to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <a href="index.html" class="back-btn">← Dashboard</a>
+    <div>
+      <div class="page-title">Progresión</div>
+      <div class="page-sub" id="today-date"></div>
+    </div>
+  </div>
+
+  <!-- Weekly volume banner -->
+  <div class="section-label">Volumen Semanal</div>
+  <div class="card" id="prog-card"><div class="no-data">Cargando...</div></div>
+
+  <!-- 2-week run grid -->
+  <div class="section-label">Últimas 2 Semanas — Runs</div>
+  <div class="card" id="grid-card"><div class="no-data">Cargando...</div></div>
+
+  <!-- Recovery metrics -->
+  <div class="section-label">Recuperación Esta Semana</div>
+  <div class="readiness-grid" id="readiness-grid"></div>
+
+  <!-- Smart recommendation -->
+  <div id="rec-wrap"></div>
+
+</div>
+
+<script>
+  // ── Utilities ────────────────────────────────────────────────────────────────
+  const DAY_NAMES = ['L','M','X','J','V','S','D']; // Mon→Sun display order
+
+  function toISO(d) { return d.toISOString().slice(0, 10); }
+
+  /** Monday of the week containing dateStr (ISO). */
+  function weekMonday(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const dow = d.getDay(); // 0=Sun
+    d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
+    return toISO(d);
+  }
+
+  /** All 7 ISO dates Mon→Sun for a given Monday string. */
+  function weekDates(monStr) {
+    const out = [];
+    const start = new Date(monStr + 'T00:00:00');
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      out.push(toISO(d));
+    }
+    return out;
+  }
+
+  function mean(arr) {
+    const v = arr.filter(x => x != null && !isNaN(x));
+    return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null;
+  }
+
+  function fmtKm(km) { return km != null ? km.toFixed(1) : '—'; }
+
+  // ── Date header ──────────────────────────────────────────────────────────────
+  const now    = new Date();
+  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  document.getElementById('today-date').textContent =
+    `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+
+  // ── Data processing ──────────────────────────────────────────────────────────
+  function processHistory(h) {
+    const todayStr   = toISO(now);
+    const thisMonStr = weekMonday(todayStr);
+    const lastMonDt  = new Date(thisMonStr + 'T00:00:00');
+    lastMonDt.setDate(lastMonDt.getDate() - 7);
+    const lastMonStr = toISO(lastMonDt);
+
+    // ── Index by date ──
+    const runsByDate = {}; // date → total km (may have >1 run/day)
+    for (const r of h.runs || []) {
+      if (!r.date || !r.distance_km) continue;
+      runsByDate[r.date] = (runsByDate[r.date] || 0) + r.distance_km;
+    }
+
+    const sleepByDate = {};
+    for (const s of h.sleep || []) {
+      if (s.date) sleepByDate[s.date] = { score: s.score };
+    }
+
+    const dailyByDate = {};
+    for (const d of h.daily || []) {
+      if (d.date) dailyByDate[d.date] = d;
+    }
+
+    // ── Week windows ──
+    const thisDates = weekDates(thisMonStr);
+    const lastDates = weekDates(lastMonStr);
+
+    const thisKm = thisDates.reduce((s, d) => s + (runsByDate[d] || 0), 0);
+    const lastKm = lastDates.reduce((s, d) => s + (runsByDate[d] || 0), 0);
+
+    // ── Prior weeks (before last week) ──
+    const priorWeekKm = {};
+    for (const [date, km] of Object.entries(runsByDate)) {
+      const mon = weekMonday(date);
+      if (mon < lastMonStr) priorWeekKm[mon] = (priorWeekKm[mon] || 0) + km;
+    }
+    const priorVals     = Object.values(priorWeekKm);
+    const priorAvgKm    = mean(priorVals);
+    const priorWkCount  = priorVals.length;
+
+    // ── Readiness: this week vs last week ──
+    function weekMeans(dates) {
+      return {
+        sleep:   mean(dates.map(d => sleepByDate[d]?.score)),
+        rhr:     mean(dates.map(d => dailyByDate[d]?.resting_hr)),
+        battery: mean(dates.map(d => dailyByDate[d]?.body_battery_high)),
+        steps:   mean(dates.map(d => dailyByDate[d]?.steps)),
+      };
+    }
+
+    return {
+      thisMonStr, lastMonStr, thisDates, lastDates,
+      runsByDate, sleepByDate, dailyByDate,
+      thisKm, lastKm,
+      priorAvgKm, priorWkCount,
+      thisWeek: weekMeans(thisDates),
+      lastWeek: weekMeans(lastDates),
+    };
+  }
+
+  // ── Recommendation logic ─────────────────────────────────────────────────────
+  function computeRec(data) {
+    const { lastKm, thisWeek, lastWeek } = data;
+    if (!lastKm) return null;
+
+    // Score 0-3: one point per readiness signal that's good
+    let score = 0;
+    // RHR: lower is better — stable or falling = good
+    if (thisWeek.rhr != null) {
+      const ok = lastWeek.rhr != null ? thisWeek.rhr <= lastWeek.rhr : thisWeek.rhr < 65;
+      if (ok) score++;
+    }
+    if (thisWeek.sleep != null && thisWeek.sleep >= 65)   score++;
+    if (thisWeek.battery != null && thisWeek.battery >= 65) score++;
+
+    // Map readiness score → target % (10 – 25 % band)
+    const pctMap = [10, 14, 19, 25];
+    const targetPct = pctMap[score];
+    const targetKm  = lastKm * (1 + targetPct / 100);
+
+    return { score, targetPct, targetKm,
+             minKm: lastKm * 1.10, maxKm: lastKm * 1.25 };
+  }
+
+  // ── Render: progression banner ───────────────────────────────────────────────
+  function renderProgCard(data) {
+    const { thisKm, lastKm, priorAvgKm, priorWkCount } = data;
+
+    const pct = lastKm > 0 ? ((thisKm - lastKm) / lastKm) * 100 : null;
+    let badgeClass = 'down', badgeText = '—';
+    if (pct != null) {
+      const sign = pct >= 0 ? '+' : '';
+      badgeText = `${sign}${Math.round(pct)}%`;
+      badgeClass = pct >= 10 && pct <= 25 ? 'on-target'
+                 : pct > 0  && pct <  10  ? 'under'
+                 : pct > 25              ? 'over' : 'down';
+    }
+
+    const zoneHtml = lastKm > 0 ? `
+      <div class="target-band">
+        Zona segura: <span class="hl">${fmtKm(lastKm * 1.10)} – ${fmtKm(lastKm * 1.25)} km</span>
+        &nbsp;·&nbsp; +10 % a +25 % vs semana pasada
+      </div>` : '';
+
+    const priorHtml = priorAvgKm != null ? `
+      <div class="prior-row">
+        <span class="prior-label">Prom. ${priorWkCount} sem. anteriores</span>
+        <span class="prior-val">${fmtKm(priorAvgKm)}<span class="prior-unit">km/sem</span></span>
+      </div>` : '';
+
+    document.getElementById('prog-card').innerHTML = `
+      <div class="prog-row">
+        <div>
+          <div class="prog-km">${fmtKm(thisKm)}<span class="prog-km-unit">km</span></div>
+          <div class="prog-sublabel">Esta semana</div>
+        </div>
+        <div style="text-align:right">
+          <div class="delta-badge ${badgeClass}">${badgeText}</div>
+          <div class="prog-sublabel" style="margin-top:5px">${fmtKm(lastKm)} km sem. ant.</div>
+        </div>
+      </div>
+      ${zoneHtml}
+      ${priorHtml}`;
+  }
+
+  // ── Render: 2-week day grid ──────────────────────────────────────────────────
+  function renderGridCard(data) {
+    const { thisDates, lastDates, runsByDate, thisKm, lastKm } = data;
+    const allKm  = [...thisDates, ...lastDates].map(d => runsByDate[d] || 0);
+    const maxDay = Math.max(...allKm, 0.01);
+
+    function weekBlock(dates, blockLabel, total) {
+      const cols = dates.map((d, i) => {
+        const km    = runsByDate[d] || 0;
+        const isRun = km > 0;
+        const barH  = isRun ? Math.max(Math.round((km / maxDay) * 44), 6) : 2;
+        return `
+          <div class="day-col">
+            <div class="day-name">${DAY_NAMES[i]}</div>
+            <div class="bar-track">
+              <div class="bar-fill ${isRun ? 'run' : 'zero'}" style="height:${barH}px"></div>
+            </div>
+            <div class="day-val ${isRun ? '' : 'zero'}">${isRun ? km.toFixed(1) : '—'}</div>
+          </div>`;
+      }).join('');
+      return `
+        <div class="week-block">
+          <div class="week-block-hdr">
+            <span class="wk-label">${blockLabel}</span>
+            <span class="wk-total">${fmtKm(total)}<span class="wk-total-unit">km</span></span>
+          </div>
+          <div class="days-row">${cols}</div>
+        </div>`;
+    }
+
+    document.getElementById('grid-card').innerHTML =
+      weekBlock(thisDates, 'Esta semana', thisKm) +
+      weekBlock(lastDates, 'Semana anterior', lastKm);
+  }
+
+  // ── Render: readiness grid (2×2) ─────────────────────────────────────────────
+  function renderReadiness(data) {
+    const { thisWeek, lastWeek } = data;
+
+    function rCard(icon, label, thisVal, lastVal, lowerIsBetter) {
+      const val  = thisVal != null ? Math.round(thisVal) : null;
+      const diff = (thisVal != null && lastVal != null)
+                   ? Math.round(thisVal - lastVal) : null;
+      let cls = 'flat', dText = '—';
+      if (diff != null) {
+        const sign = diff > 0 ? '+' : '';
+        const good = lowerIsBetter ? diff <= 0 : diff >= 0;
+        cls   = diff === 0 ? 'flat' : good ? 'good' : 'bad';
+        dText = `${sign}${diff} vs sem. ant.`;
+      }
+      return `
+        <div class="r-card">
+          <div class="r-icon">${icon}</div>
+          <div class="r-val">${val != null ? val : '—'}</div>
+          <div class="r-label">${label}</div>
+          <div class="r-delta ${cls}">${dText}</div>
+        </div>`;
+    }
+
+    document.getElementById('readiness-grid').innerHTML =
+      rCard('💓', 'FC Reposo',   thisWeek.rhr,     lastWeek.rhr,     true)  +
+      rCard('😴', 'Sueño',       thisWeek.sleep,   lastWeek.sleep,   false) +
+      rCard('⚡', 'Body Battery', thisWeek.battery, lastWeek.battery, false) +
+      rCard('👣', 'Pasos / día',  thisWeek.steps,   lastWeek.steps,   false);
+  }
+
+  // ── Render: recommendation ────────────────────────────────────────────────────
+  function renderRec(data) {
+    const rec  = computeRec(data);
+    const wrap = document.getElementById('rec-wrap');
+    if (!rec) { wrap.innerHTML = ''; return; }
+
+    const reasons = [];
+    if (data.thisWeek.rhr     != null) reasons.push('FC reposo');
+    if (data.thisWeek.sleep   != null) reasons.push('sueño');
+    if (data.thisWeek.battery != null) reasons.push('body battery');
+
+    const dots = [0,1,2,3].map(i =>
+      `<div class="rec-dot ${i < rec.score ? 'on' : ''}"></div>`
+    ).join('');
+
+    const reasonStr = reasons.length
+      ? ` Basado en: ${reasons.join(', ')}.`
+      : '';
+
+    const progress = data.lastKm > 0 ? `
+      <div style="margin-top:8px;font-family:'DM Mono',monospace;font-size:9px;
+        color:var(--muted);letter-spacing:.04em;">
+        Zona segura completa: ${fmtKm(rec.minKm)} – ${fmtKm(rec.maxKm)} km
+      </div>` : '';
+
+    wrap.innerHTML = `
+      <div class="rec-card">
+        <div class="rec-eyebrow">💡 Recomendación esta semana</div>
+        <div class="rec-text">
+          Apunta a <span class="hl">+${rec.targetPct}%</span> →
+          <span class="hl">${rec.targetKm.toFixed(1)} km</span>.${reasonStr}
+        </div>
+        ${progress}
+        <div class="rec-dots">${dots}</div>
+      </div>`;
+  }
+
+  // ── Bootstrap ────────────────────────────────────────────────────────────────
+  async function init() {
+    try {
+      const res = await fetch('data/garmin_history.json?v=' + Date.now());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const history = await res.json();
+
+      const data = processHistory(history);
+      renderProgCard(data);
+      renderGridCard(data);
+      renderReadiness(data);
+      renderRec(data);
+    } catch (e) {
+      console.error('Failed to load history:', e);
+      const msg = '<div class="no-data">Sin datos — el workflow de Garmin aún no ha corrido.</div>';
+      document.getElementById('prog-card').innerHTML = msg;
+      document.getElementById('grid-card').innerHTML = msg;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
