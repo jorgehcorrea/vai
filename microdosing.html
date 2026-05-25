@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Diario Fadiman</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080a0f;
+    --surface: #0e1118;
+    --card: #12151e;
+    --border: rgba(255,255,255,0.06);
+    --accent: #c8f135;
+    --sage: #7ab648;
+    --muted: #5a6070;
+    --text: #e8eaf0;
+    --dim: #8a909e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html, body {
+    min-height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,241,53,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,241,53,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 420px; margin: 0 auto;
+    padding: 20px 16px 48px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  /* Header */
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-top: 8px;
+    animation: slide-down 0.4s ease both;
+  }
+
+  .title-block .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .title-block h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; letter-spacing: 0.05em;
+    line-height: 1; color: var(--text);
+  }
+
+  .cycle-badge {
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.2);
+    border-radius: 10px;
+    padding: 8px 12px;
+    text-align: center;
+  }
+
+  .cycle-badge .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; color: var(--accent); line-height: 1;
+  }
+
+  .cycle-badge .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase;
+  }
+
+  /* Progress strip */
+  .progress-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    animation: slide-up 0.4s 0.1s ease both; opacity: 0;
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .dose-dots {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+
+  .dose-dot {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    transition: all 0.2s ease;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--muted);
+  }
+
+  .dose-dot.logged {
+    background: rgba(200,241,53,0.12);
+    border-color: rgba(200,241,53,0.3);
+    color: var(--accent);
+  }
+
+  .dose-dot.today {
+    box-shadow: 0 0 0 2px var(--accent);
+    color: var(--accent);
+  }
+
+  /* Log form */
+  .log-form {
+    background: var(--card);
+    border: 1px solid rgba(200,241,53,0.15);
+    border-radius: 20px;
+    padding: 20px;
+    animation: slide-up 0.4s 0.15s ease both; opacity: 0;
+  }
+
+  .form-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; color: var(--accent);
+    letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+
+  .metrics-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 14px;
+  }
+
+  .metric-block label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em;
+    color: var(--muted); text-transform: uppercase;
+    display: block; margin-bottom: 6px;
+  }
+
+  .slider-wrap {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1; height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px; outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(200,241,53,0.4);
+  }
+
+  .slider-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; color: var(--accent);
+    min-width: 18px; text-align: center;
+  }
+
+  .notes-area {
+    width: 100%; background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; padding: 10px 12px;
+    resize: none; outline: none; margin-bottom: 14px;
+    min-height: 70px;
+  }
+
+  .notes-area::placeholder { color: var(--muted); }
+  .notes-area:focus { border-color: rgba(200,241,53,0.3); }
+
+  .save-btn {
+    width: 100%; padding: 13px;
+    background: var(--accent); color: #080a0f;
+    border: none; border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px; letter-spacing: 0.1em;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+
+  .save-btn:active { opacity: 0.8; }
+
+  /* History */
+  .history-wrap {
+    animation: slide-up 0.4s 0.2s ease both; opacity: 0;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--muted); text-transform: uppercase;
+    margin-bottom: 10px; padding-left: 2px;
+  }
+
+  .entry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 16px;
+    margin-bottom: 8px;
+    position: relative; overflow: hidden;
+  }
+
+  .entry-card::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .entry-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .entry-metrics {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .entry-metric {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px;
+  }
+
+  .entry-metric .val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; color: var(--text); line-height: 1;
+  }
+
+  .entry-metric .lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: 0.08em;
+    color: var(--muted); text-transform: uppercase;
+  }
+
+  .entry-avg {
+    display: inline-block;
+    background: rgba(200,241,53,0.1);
+    border-radius: 6px; padding: 2px 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .entry-notes {
+    font-size: 12px; color: var(--dim);
+    line-height: 1.5; font-style: italic;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px;
+    animation: slide-up 0.4s 0.25s ease both; opacity: 0;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* Empty state */
+  .empty {
+    text-align: center; padding: 24px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent); color: #080a0f;
+    padding: 10px 20px; border-radius: 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 0.1em;
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @keyframes slide-down {
+    from { opacity:0; transform:translateY(-12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes slide-up {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="toast" id="toast">Guardado ✓</div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title-block">
+      <div class="eyebrow">Protocolo Fadiman</div>
+      <h1>Diario<br>Microdosing</h1>
+    </div>
+    <div class="cycle-badge">
+      <div class="num" id="dose-count">0</div>
+      <div class="lbl">dosis<br>registradas</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">Ciclo 4 semanas — 12 dosis</div>
+    <div class="dose-dots" id="dose-dots"></div>
+  </div>
+
+  <!-- Log form -->
+  <div class="log-form">
+    <div class="form-title">Registrar hoy 🍄</div>
+
+    <div class="metrics-grid">
+      <div class="metric-block">
+        <label>Estado de ánimo</label>
+        <div class="slider-wrap">
+          <input type="range" min="1" max="10" value="7" id="mood" oninput="updateVal('mood')">
+          <div class="slider-val" id="mood-val">7</div>
+        </div>
+      </div>
+      <div class="metric-block">
+        <label>Foco</label>
+        <div class="slider-wrap">
+          <input type="range" min="1" max="10" value="7" id="focus" oninput="updateVal('focus')">
+          <div class="slider-val" id="focus-val">7</div>
+        </div>
+      </div>
+      <div class="metric-block">
+        <label>Energía</label>
+        <div class="slider-wrap">
+          <input type="range" min="1" max="10" value="7" id="energy" oninput="updateVal('energy')">
+          <div class="slider-val" id="energy-val">7</div>
+        </div>
+      </div>
+      <div class="metric-block">
+        <label>Sueño (anoche)</label>
+        <div class="slider-wrap">
+          <input type="range" min="1" max="10" value="7" id="sleep" oninput="updateVal('sleep')">
+          <div class="slider-val" id="sleep-val">7</div>
+        </div>
+      </div>
+    </div>
+
+    <textarea class="notes-area" id="notes" placeholder="Notas del día — sensaciones, contexto, observaciones..."></textarea>
+
+    <button class="save-btn" onclick="saveEntry()">GUARDAR REGISTRO</button>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-wrap" id="chart-wrap" style="display:none">
+    <div class="section-label" style="margin-bottom:12px">Evolución del ciclo</div>
+    <canvas id="chart" height="160"></canvas>
+  </div>
+
+  <!-- History -->
+  <div class="history-wrap">
+    <div class="section-label">Registros anteriores</div>
+    <div id="history-list"></div>
+  </div>
+
+</div>
+
+<script>
+  // ── Dose schedule ─────────────────────────────────────────
+  const DOSE_DATES = [
+    '2026-05-20','2026-05-23','2026-05-26', // S1
+    '2026-05-29','2026-06-01','2026-06-04', // S2
+    '2026-06-07','2026-06-10','2026-06-13', // S3
+    '2026-06-16','2026-06-19','2026-06-22'  // S4
+  ];
+
+  const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  function formatKey(k) {
+    const [y,m,d] = k.split('-');
+    const dt = new Date(y, m-1, d);
+    return `${DAYS[dt.getDay()]} ${d} ${MONTHS[dt.getMonth()]}`;
+  }
+
+  // ── Storage ───────────────────────────────────────────────
+  function getEntries() {
+    try { return JSON.parse(localStorage.getItem('fadiman_entries') || '{}'); } catch { return {}; }
+  }
+
+  function saveEntries(e) {
+    localStorage.setItem('fadiman_entries', JSON.stringify(e));
+  }
+
+  // ── Sliders ───────────────────────────────────────────────
+  function updateVal(id) {
+    document.getElementById(id+'-val').textContent = document.getElementById(id).value;
+  }
+
+  // ── Save entry ────────────────────────────────────────────
+  function saveEntry() {
+    const key = todayKey();
+    const entries = getEntries();
+    entries[key] = {
+      mood: +document.getElementById('mood').value,
+      focus: +document.getElementById('focus').value,
+      energy: +document.getElementById('energy').value,
+      sleep: +document.getElementById('sleep').value,
+      notes: document.getElementById('notes').value.trim(),
+      ts: Date.now()
+    };
+    saveEntries(entries);
+    showToast();
+    render();
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  // ── Render dots ───────────────────────────────────────────
+  function renderDots() {
+    const entries = getEntries();
+    const today = todayKey();
+    const wrap = document.getElementById('dose-dots');
+    wrap.innerHTML = '';
+    DOSE_DATES.forEach((d, i) => {
+      const div = document.createElement('div');
+      div.className = 'dose-dot' + (entries[d] ? ' logged' : '') + (d === today ? ' today' : '');
+      div.textContent = entries[d] ? '✓' : String(i+1);
+      div.title = formatKey(d);
+      wrap.appendChild(div);
+    });
+    document.getElementById('dose-count').textContent = Object.keys(entries).length;
+  }
+
+  // ── Render history ────────────────────────────────────────
+  function renderHistory() {
+    const entries = getEntries();
+    const list = document.getElementById('history-list');
+    const keys = Object.keys(entries).sort().reverse();
+
+    if (!keys.length) {
+      list.innerHTML = '<div class="empty">SIN REGISTROS AÚN<br>Guarda tu primera sesión arriba</div>';
+      return;
+    }
+
+    list.innerHTML = keys.map(k => {
+      const e = entries[k];
+      const avg = ((e.mood + e.focus + e.energy + e.sleep) / 4).toFixed(1);
+      return `<div class="entry-card">
+        <div class="entry-date">${formatKey(k)}</div>
+        <div class="entry-metrics">
+          <div class="entry-metric"><div class="val">${e.mood}</div><div class="lbl">Ánimo</div></div>
+          <div class="entry-metric"><div class="val">${e.focus}</div><div class="lbl">Foco</div></div>
+          <div class="entry-metric"><div class="val">${e.energy}</div><div class="lbl">Energía</div></div>
+          <div class="entry-metric"><div class="val">${e.sleep}</div><div class="lbl">Sueño</div></div>
+        </div>
+        <div class="entry-avg">Promedio: ${avg}</div>
+        ${e.notes ? `<div class="entry-notes">"${e.notes}"</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // ── Chart ─────────────────────────────────────────────────
+  let chartInstance = null;
+
+  function renderChart() {
+    const entries = getEntries();
+    const keys = Object.keys(entries).sort();
+    const wrap = document.getElementById('chart-wrap');
+
+    if (keys.length < 2) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+
+    const labels = keys.map(k => formatKey(k).split(' ').slice(0,2).join(' '));
+    const mood    = keys.map(k => entries[k].mood);
+    const focus   = keys.map(k => entries[k].focus);
+    const energy  = keys.map(k => entries[k].energy);
+    const avg     = keys.map(k => +((entries[k].mood + entries[k].focus + entries[k].energy + entries[k].sleep)/4).toFixed(1));
+
+    const ctx = document.getElementById('chart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label:'Promedio', data: avg, borderColor:'#c8f135', backgroundColor:'rgba(200,241,53,0.1)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#c8f135', pointRadius:4 },
+          { label:'Ánimo',    data: mood,   borderColor:'rgba(200,241,53,0.4)', borderWidth:1, tension:0.4, pointRadius:2 },
+          { label:'Foco',     data: focus,  borderColor:'rgba(53,200,241,0.4)', borderWidth:1, tension:0.4, pointRadius:2 },
+          { label:'Energía',  data: energy, borderColor:'rgba(241,178,53,0.4)', borderWidth:1, tension:0.4, pointRadius:2 },
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { ticks: { color:'#5a6070', font:{ family:'DM Mono', size:9 } }, grid:{ color:'rgba(255,255,255,0.04)' } },
+          y: { min:1, max:10, ticks:{ color:'#5a6070', font:{ family:'DM Mono', size:9 }, stepSize:2 }, grid:{ color:'rgba(255,255,255,0.04)' } }
+        },
+        plugins: {
+          legend: { labels:{ color:'#5a6070', font:{ family:'DM Mono', size:9 }, boxWidth:10 } }
+        }
+      }
+    });
+  }
+
+  // ── Pre-fill if already logged today ─────────────────────
+  function prefill() {
+    const entries = getEntries();
+    const key = todayKey();
+    if (entries[key]) {
+      const e = entries[key];
+      ['mood','focus','energy','sleep'].forEach(id => {
+        document.getElementById(id).value = e[id];
+        updateVal(id);
+      });
+      document.getElementById('notes').value = e.notes || '';
+    }
+  }
+
+  // ── Main render ───────────────────────────────────────────
+  function render() {
+    renderDots();
+    renderHistory();
+    renderChart();
+  }
+
+  // Load Chart.js then render
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';
+  s.onload = () => { prefill(); render(); };
+  document.head.appendChild(s);
+</script>
+</body>
+</html>
