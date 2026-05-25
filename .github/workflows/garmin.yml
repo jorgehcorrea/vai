@@ -1,0 +1,41 @@
+name: Fetch Garmin Data
+
+on:
+  schedule:
+    - cron: '0 12 * * *'   # 07:00 Ecuador time (UTC-5)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-garmin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install garminconnect
+        run: pip install garminconnect
+
+      - name: Fetch Garmin data
+        env:
+          GARMIN_TOKENS: ${{ secrets.GARMIN_TOKENS }}
+        run: |
+          echo "${GARMIN_TOKENS}" > /tmp/garmin_tokens.json
+          python3 scripts/fetch_garmin.py
+
+      - name: Process and save Garmin data
+        run: python3 scripts/process_garmin.py
+
+      - name: Commit Garmin data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/garmin.json
+          git diff --staged --quiet || \
+            git commit -m "chore: update garmin data $(date -u +%Y-%m-%d)"
+          git push
