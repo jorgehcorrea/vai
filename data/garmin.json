@@ -1,9 +1,18 @@
 {
-  "date": null,
+  "date": "2026-05-25",
   "user_summary": {},
-  "sleep": {},
+  "sleep": {
+    "duration_seconds": null,
+    "score": null,
+    "deep_sleep_seconds": null,
+    "light_sleep_seconds": null,
+    "rem_sleep_seconds": null,
+    "awake_seconds": null,
+    "start_time_gmt": null,
+    "end_time_gmt": null
+  },
   "heart_rate": {},
   "last_activity": {},
   "hrv": {},
-  "last_updated": null
+  "last_updated": "2026-05-25 03:39:28 UTC"
 }
