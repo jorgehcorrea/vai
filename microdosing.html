@@ -42,7 +42,7 @@
   .container {
     position: relative; z-index: 1;
     max-width: 420px; margin: 0 auto;
-    padding: 20px 16px 48px;
+    padding: 20px 16px 90px;
     display: flex; flex-direction: column; gap: 16px;
   }
 
@@ -312,6 +312,23 @@
     from { opacity:0; transform:translateY(12px); }
     to { opacity:1; transform:translateY(0); }
   }
+
+  /* ── Bottom nav ── */
+  .nav-bar { position:fixed; bottom:0; left:0; right:0; z-index:100;
+    display:flex; justify-content:center; }
+  .nav-inner { width:100%; max-width:420px; display:flex;
+    background:rgba(8,10,15,0.94); backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-bottom:env(safe-area-inset-bottom); }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center;
+    gap:3px; padding:10px 0 12px; text-decoration:none;
+    color:var(--muted); transition:color .15s; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item:hover  { color:var(--text); }
+  .nav-icon  { font-size:20px; line-height:1; }
+  .nav-label { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.08em; text-transform:uppercase; }
 </style>
 </head>
 <body>
@@ -567,5 +584,13 @@
   s.onload = () => { prefill(); render(); };
   document.head.appendChild(s);
 </script>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html"       class="nav-item"><div class="nav-icon">🏃</div><div class="nav-label">Entreno</div></a>
+    <a href="training.html"    class="nav-item"><div class="nav-icon">📈</div><div class="nav-label">Progresión</div></a>
+    <a href="microdosing.html" class="nav-item active"><div class="nav-icon">🌿</div><div class="nav-label">Diario</div></a>
+  </div>
+</nav>
 </body>
 </html>

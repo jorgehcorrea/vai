@@ -32,7 +32,7 @@
   @keyframes pulse-glow { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
 
   .container { position:relative; z-index:1; max-width:420px; margin:0 auto;
-    padding:20px 16px 40px; display:flex; flex-direction:column; gap:12px; }
+    padding:20px 16px 90px; display:flex; flex-direction:column; gap:12px; }
 
   /* ── Header ── */
   .header { display:flex; align-items:center; gap:12px; padding-top:8px;
@@ -142,6 +142,23 @@
     background:rgba(200,241,53,.25); }
   .rec-dot.on { background:var(--accent); }
 
+  /* ── Bottom nav ── */
+  .nav-bar { position:fixed; bottom:0; left:0; right:0; z-index:100;
+    display:flex; justify-content:center; }
+  .nav-inner { width:100%; max-width:420px; display:flex;
+    background:rgba(8,10,15,0.94); backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-bottom:env(safe-area-inset-bottom); }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center;
+    gap:3px; padding:10px 0 12px; text-decoration:none;
+    color:var(--muted); transition:color .15s; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item:hover  { color:var(--text); }
+  .nav-icon  { font-size:20px; line-height:1; }
+  .nav-label { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.08em; text-transform:uppercase; }
+
   /* ── Utility ── */
   .no-data { font-family:'DM Mono',monospace; font-size:11px;
     color:var(--muted); text-align:center; padding:22px 0; }
@@ -157,7 +174,6 @@
 
   <!-- Header -->
   <div class="header">
-    <a href="index.html" class="back-btn">← Dashboard</a>
     <div>
       <div class="page-title">Progresión</div>
       <div class="page-sub" id="today-date"></div>
@@ -473,5 +489,13 @@
 
   init();
 </script>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html"       class="nav-item"><div class="nav-icon">🏃</div><div class="nav-label">Entreno</div></a>
+    <a href="training.html"    class="nav-item active"><div class="nav-icon">📈</div><div class="nav-label">Progresión</div></a>
+    <a href="microdosing.html" class="nav-item"><div class="nav-icon">🌿</div><div class="nav-label">Diario</div></a>
+  </div>
+</nav>
 </body>
 </html>

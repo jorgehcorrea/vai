@@ -71,7 +71,7 @@
     z-index: 1;
     max-width: 420px;
     margin: 0 auto;
-    padding: 20px 16px 32px;
+    padding: 20px 16px 90px;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -451,6 +451,23 @@
   .weight-line .w-delta.down { color: var(--accent); }
   .weight-line .w-delta.flat { color: var(--muted); }
 
+  /* ── Bottom nav ── */
+  .nav-bar { position:fixed; bottom:0; left:0; right:0; z-index:100;
+    display:flex; justify-content:center; }
+  .nav-inner { width:100%; max-width:420px; display:flex;
+    background:rgba(8,10,15,0.94); backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-bottom:env(safe-area-inset-bottom); }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center;
+    gap:3px; padding:10px 0 12px; text-decoration:none;
+    color:var(--muted); transition:color .15s; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item:hover  { color:var(--text); }
+  .nav-icon  { font-size:20px; line-height:1; }
+  .nav-label { font-family:'DM Mono',monospace; font-size:9px;
+    letter-spacing:.08em; text-transform:uppercase; }
+
   /* Rest day */
   .rest-message {
     text-align: center;
@@ -558,10 +575,6 @@
   </div>
 
   <!-- Health metrics strip -->
-  <div style="display:flex;justify-content:space-between;align-items:center;padding-left:2px;">
-    <span style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;">Hoy</span>
-    <a href="training.html" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--muted);text-decoration:none;">Progresión →</a>
-  </div>
   <div class="health-strip" id="health-strip"></div>
 
   <!-- Today's workout -->
@@ -927,5 +940,13 @@
   loadHealthData();
 
 </script>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html"       class="nav-item active"><div class="nav-icon">🏃</div><div class="nav-label">Entreno</div></a>
+    <a href="training.html"    class="nav-item"><div class="nav-icon">📈</div><div class="nav-label">Progresión</div></a>
+    <a href="microdosing.html" class="nav-item"><div class="nav-icon">🌿</div><div class="nav-label">Diario</div></a>
+  </div>
+</nav>
 </body>
 </html>
