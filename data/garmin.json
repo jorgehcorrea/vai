@@ -12,7 +12,15 @@
     "end_time_gmt": null
   },
   "heart_rate": {},
-  "last_activity": {},
+  "last_activity": {
+    "type": "running",
+    "name": "Quito Carrera",
+    "distance_m": 5013.509765625,
+    "duration_seconds": 1867,
+    "avg_hr": 170.0,
+    "calories": 341.0,
+    "start_time_local": "2026-05-24 09:18:12"
+  },
   "hrv": {},
-  "last_updated": "2026-05-25 03:39:28 UTC"
+  "last_updated": "2026-05-25 14:50:04 UTC"
 }

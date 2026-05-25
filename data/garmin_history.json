@@ -1,6 +1,298 @@
 {
-  "last_updated": null,
-  "runs": [],
-  "sleep": [],
+  "last_updated": "2026-05-25 14:50:04 UTC",
+  "runs": [
+    {
+      "date": "2026-05-24",
+      "activity_type": "running",
+      "distance_km": 5.01,
+      "duration_seconds": 1867,
+      "avg_hr": 170.0,
+      "avg_pace_min_km": 6.21,
+      "calories": 341.0
+    },
+    {
+      "date": "2026-05-23",
+      "activity_type": "running",
+      "distance_km": 1.63,
+      "duration_seconds": 850,
+      "avg_hr": 131.0,
+      "avg_pace_min_km": 8.71,
+      "calories": 101.0
+    },
+    {
+      "date": "2026-05-21",
+      "activity_type": "indoor_cardio",
+      "distance_km": null,
+      "duration_seconds": 2074,
+      "avg_hr": 117.0,
+      "avg_pace_min_km": null,
+      "calories": 204.0
+    },
+    {
+      "date": "2026-05-20",
+      "activity_type": "yoga",
+      "distance_km": null,
+      "duration_seconds": 1506,
+      "avg_hr": 90.0,
+      "avg_pace_min_km": null,
+      "calories": 76.0
+    },
+    {
+      "date": "2026-05-19",
+      "activity_type": "yoga",
+      "distance_km": null,
+      "duration_seconds": 728,
+      "avg_hr": 75.0,
+      "avg_pace_min_km": null,
+      "calories": 23.0
+    },
+    {
+      "date": "2026-05-18",
+      "activity_type": "indoor_cardio",
+      "distance_km": null,
+      "duration_seconds": 2104,
+      "avg_hr": 124.0,
+      "avg_pace_min_km": null,
+      "calories": 227.0
+    },
+    {
+      "date": "2026-05-17",
+      "activity_type": "indoor_cardio",
+      "distance_km": null,
+      "duration_seconds": 2113,
+      "avg_hr": 132.0,
+      "avg_pace_min_km": null,
+      "calories": 267.0
+    },
+    {
+      "date": "2026-05-17",
+      "activity_type": "running",
+      "distance_km": 4.01,
+      "duration_seconds": 1556,
+      "avg_hr": 163.0,
+      "avg_pace_min_km": 6.46,
+      "calories": 273.0
+    },
+    {
+      "date": "2026-05-15",
+      "activity_type": "running",
+      "distance_km": 0.93,
+      "duration_seconds": 508,
+      "avg_hr": 122.0,
+      "avg_pace_min_km": 9.15,
+      "calories": 54.0
+    },
+    {
+      "date": "2026-05-10",
+      "activity_type": "running",
+      "distance_km": 5.87,
+      "duration_seconds": 2722,
+      "avg_hr": 146.0,
+      "avg_pace_min_km": 7.72,
+      "calories": 374.0
+    }
+  ],
+  "sleep": [
+    {
+      "date": "2026-05-24",
+      "duration_seconds": 24600,
+      "score": null,
+      "deep_sleep_seconds": 3240,
+      "light_sleep_seconds": 14820,
+      "rem_sleep_seconds": 6540,
+      "awake_seconds": 420,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-23",
+      "duration_seconds": 22800,
+      "score": null,
+      "deep_sleep_seconds": 2580,
+      "light_sleep_seconds": 13680,
+      "rem_sleep_seconds": 6540,
+      "awake_seconds": 120,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-22",
+      "duration_seconds": 19860,
+      "score": null,
+      "deep_sleep_seconds": 5340,
+      "light_sleep_seconds": 9480,
+      "rem_sleep_seconds": 5040,
+      "awake_seconds": 120,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-21",
+      "duration_seconds": 23340,
+      "score": null,
+      "deep_sleep_seconds": 2400,
+      "light_sleep_seconds": 15900,
+      "rem_sleep_seconds": 5040,
+      "awake_seconds": 300,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-20",
+      "duration_seconds": 18240,
+      "score": null,
+      "deep_sleep_seconds": 3180,
+      "light_sleep_seconds": 11280,
+      "rem_sleep_seconds": 3780,
+      "awake_seconds": 300,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-19",
+      "duration_seconds": 21780,
+      "score": null,
+      "deep_sleep_seconds": 1980,
+      "light_sleep_seconds": 16440,
+      "rem_sleep_seconds": 3360,
+      "awake_seconds": 120,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-17",
+      "duration_seconds": 33300,
+      "score": null,
+      "deep_sleep_seconds": 6720,
+      "light_sleep_seconds": 21300,
+      "rem_sleep_seconds": 5280,
+      "awake_seconds": 480,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-16",
+      "duration_seconds": 27720,
+      "score": null,
+      "deep_sleep_seconds": 2460,
+      "light_sleep_seconds": 19500,
+      "rem_sleep_seconds": 5760,
+      "awake_seconds": 600,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-14",
+      "duration_seconds": 22380,
+      "score": null,
+      "deep_sleep_seconds": 5040,
+      "light_sleep_seconds": 13440,
+      "rem_sleep_seconds": 3900,
+      "awake_seconds": 480,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-13",
+      "duration_seconds": 23220,
+      "score": null,
+      "deep_sleep_seconds": 1500,
+      "light_sleep_seconds": 15480,
+      "rem_sleep_seconds": 6240,
+      "awake_seconds": 420,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-12",
+      "duration_seconds": 24240,
+      "score": null,
+      "deep_sleep_seconds": 3000,
+      "light_sleep_seconds": 14520,
+      "rem_sleep_seconds": 6720,
+      "awake_seconds": 300,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-11",
+      "duration_seconds": 27300,
+      "score": null,
+      "deep_sleep_seconds": 2880,
+      "light_sleep_seconds": 19200,
+      "rem_sleep_seconds": 5220,
+      "awake_seconds": 180,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-10",
+      "duration_seconds": 22260,
+      "score": null,
+      "deep_sleep_seconds": 2820,
+      "light_sleep_seconds": 14220,
+      "rem_sleep_seconds": 5220,
+      "awake_seconds": 360,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-07",
+      "duration_seconds": 18360,
+      "score": null,
+      "deep_sleep_seconds": 2220,
+      "light_sleep_seconds": 11220,
+      "rem_sleep_seconds": 4920,
+      "awake_seconds": 240,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-06",
+      "duration_seconds": 30960,
+      "score": null,
+      "deep_sleep_seconds": 3300,
+      "light_sleep_seconds": 20460,
+      "rem_sleep_seconds": 7200,
+      "awake_seconds": 180,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-05",
+      "duration_seconds": 25440,
+      "score": null,
+      "deep_sleep_seconds": 3960,
+      "light_sleep_seconds": 15840,
+      "rem_sleep_seconds": 5640,
+      "awake_seconds": 180,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-04",
+      "duration_seconds": 22320,
+      "score": null,
+      "deep_sleep_seconds": 2700,
+      "light_sleep_seconds": 14940,
+      "rem_sleep_seconds": 4680,
+      "awake_seconds": 240,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-03",
+      "duration_seconds": 31680,
+      "score": null,
+      "deep_sleep_seconds": 3720,
+      "light_sleep_seconds": 23820,
+      "rem_sleep_seconds": 4140,
+      "awake_seconds": 1080,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-02",
+      "duration_seconds": 32220,
+      "score": null,
+      "deep_sleep_seconds": 3840,
+      "light_sleep_seconds": 22020,
+      "rem_sleep_seconds": 6360,
+      "awake_seconds": 1260,
+      "hrv_weekly_average": null
+    },
+    {
+      "date": "2026-05-01",
+      "duration_seconds": 31560,
+      "score": null,
+      "deep_sleep_seconds": 3240,
+      "light_sleep_seconds": 22800,
+      "rem_sleep_seconds": 5520,
+      "awake_seconds": 720,
+      "hrv_weekly_average": null
+    }
+  ],
   "daily": []
 }
