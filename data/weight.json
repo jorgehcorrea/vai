@@ -1,4 +1,30 @@
 {
-  "entries": [],
-  "last_updated": ""
+  "entries": [
+    {
+      "date": "2026-05-03",
+      "weight_kg": 68.95,
+      "timestamp": 1777819029
+    },
+    {
+      "date": "2026-05-02",
+      "weight_kg": 67.52,
+      "timestamp": 1777738909
+    },
+    {
+      "date": "2026-05-01",
+      "weight_kg": 66.95,
+      "timestamp": 1777659137
+    },
+    {
+      "date": "2026-04-27",
+      "weight_kg": 68.01,
+      "timestamp": 1777290994
+    },
+    {
+      "date": "2026-04-26",
+      "weight_kg": 69.27,
+      "timestamp": 1777168000
+    }
+  ],
+  "last_updated": "2026-05-25 02:39:43 UTC"
 }
