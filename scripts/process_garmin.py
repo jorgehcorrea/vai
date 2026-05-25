@@ -22,6 +22,7 @@ def extract_user_summary(summary):
         "body_battery_drained":       summary.get("bodyBatteryDrainedValue"),
         "body_battery_highest":       summary.get("bodyBatteryHighestValue"),
         "body_battery_lowest":        summary.get("bodyBatteryLowestValue"),
+        "body_battery_most_recent":   summary.get("bodyBatteryMostRecentValue"),
         "stress_avg":                 summary.get("averageStressLevel"),
         "stress_max":                 summary.get("maxStressLevel"),
         "calories_active":            summary.get("activeKilocalories"),

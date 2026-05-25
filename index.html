@@ -468,6 +468,64 @@
     letter-spacing: 0.1em;
     margin-bottom: 6px;
   }
+
+  /* Health metrics strip */
+  .health-strip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 0 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    animation: slide-up 0.5s 0.15s ease both;
+    opacity: 0;
+  }
+
+  .health-strip::-webkit-scrollbar { display: none; }
+
+  .health-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    min-width: 96px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .hc-icon {
+    font-size: 16px;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .hc-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .hc-value.blue { color: var(--accent2); }
+
+  .hc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .hc-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
 </style>
 </head>
 <body>
@@ -498,6 +556,9 @@
       <div class="countdown-label">días</div>
     </div>
   </div>
+
+  <!-- Health metrics strip -->
+  <div class="health-strip" id="health-strip"></div>
 
   <!-- Today's workout -->
   <div class="section-label">Sesión de hoy</div>
@@ -742,35 +803,124 @@
   const mottoEl = document.getElementById('daily-motto');
   mottoEl.innerHTML = MOTTOS[today.getDay() % MOTTOS.length];
 
-  // ── Weight ───────────────────────────────────────────────
-  async function loadWeight() {
-    try {
-      const res = await fetch('data/weight.json?t=' + Date.now());
-      if (!res.ok) return;
-      const data = await res.json();
-      const entries = (data.entries || []).filter(e => e.weight_kg);
-      if (!entries.length) return;
+  // ── Health data (weight + Garmin) ────────────────────────
+  function fmtSleep(seconds) {
+    if (!seconds) return '—';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${h}h${String(m).padStart(2, '0')}`;
+  }
 
-      // Most recent entry (entries are sorted newest-first)
+  function fmtPace(durSec, distM) {
+    if (!durSec || !distM) return '—';
+    const sPerKm = durSec / (distM / 1000);
+    const m = Math.floor(sPerKm / 60);
+    const s = Math.round(sPerKm % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  function fmtDist(m) {
+    if (m == null || m === 0) return '—';
+    return (m / 1000).toFixed(1);
+  }
+
+  function renderHealthCards(weight, garmin) {
+    // ── header weight line ──
+    const entries = (weight?.entries || []).filter(e => e.weight_kg);
+    if (entries.length) {
       const latest = entries[0];
       const prev   = entries[1] || null;
-
       let deltaHtml = '';
       if (prev) {
         const diff = +(latest.weight_kg - prev.weight_kg).toFixed(1);
-        if (diff > 0)       deltaHtml = `<span class="w-delta up">▲ ${diff}</span>`;
-        else if (diff < 0)  deltaHtml = `<span class="w-delta down">▼ ${Math.abs(diff)}</span>`;
-        else                deltaHtml = `<span class="w-delta flat">—</span>`;
+        if (diff > 0)      deltaHtml = `<span class="w-delta up">▲ ${diff}</span>`;
+        else if (diff < 0) deltaHtml = `<span class="w-delta down">▼ ${Math.abs(diff)}</span>`;
+        else               deltaHtml = `<span class="w-delta flat">—</span>`;
       }
+      const wl = document.getElementById('weight-line');
+      wl.innerHTML = `⚖️ <span class="w-val">${latest.weight_kg} kg</span>${deltaHtml}`;
+      wl.style.display = '';
+    }
 
-      const el = document.getElementById('weight-line');
-      el.innerHTML = `⚖️ <span class="w-val">${latest.weight_kg} kg</span>${deltaHtml}`;
-      el.style.display = '';
+    // ── health cards ──
+    const s   = garmin?.sleep         || {};
+    const us  = garmin?.user_summary  || {};
+    const hrv = garmin?.hrv           || {};
+    const act = garmin?.last_activity || {};
+
+    const latest = entries[0] || null;
+
+    const cards = [
+      {
+        icon:  '⚖️',
+        value: latest ? latest.weight_kg.toFixed(1) : '—',
+        unit:  latest ? 'kg' : '',
+        label: 'Peso',
+        sub:   latest ? latest.date : '—',
+        blue:  false,
+      },
+      {
+        icon:  '😴',
+        value: fmtSleep(s.duration_seconds),
+        unit:  '',
+        label: 'Sueño',
+        sub:   s.score != null ? `Score ${s.score}` : '',
+        blue:  true,
+      },
+      {
+        icon:  '⚡',
+        value: us.body_battery_most_recent ?? '—',
+        unit:  '',
+        label: 'Body Battery',
+        sub:   '',
+        blue:  false,
+      },
+      {
+        icon:  '💚',
+        value: hrv.last_night_avg ?? '—',
+        unit:  '',
+        label: 'HRV',
+        sub:   hrv.status || '',
+        blue:  false,
+      },
+      {
+        icon:  '🏃',
+        value: fmtDist(act.distance_m),
+        unit:  fmtDist(act.distance_m) !== '—' ? 'km' : '',
+        label: 'Último Run',
+        sub:   act.avg_hr
+               ? `${fmtPace(act.duration_seconds, act.distance_m)}/km · ${act.avg_hr} bpm`
+               : '',
+        blue:  false,
+      },
+    ];
+
+    const strip = document.getElementById('health-strip');
+    strip.innerHTML = cards.map(c => `
+      <div class="health-card">
+        <div class="hc-icon">${c.icon}</div>
+        <div class="hc-value${c.blue ? ' blue' : ''}">${c.value}<span style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:0.05em;color:var(--muted);margin-left:2px;">${c.unit}</span></div>
+        <div class="hc-label">${c.label}</div>
+        ${c.sub ? `<div class="hc-sub">${c.sub}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  async function loadHealthData() {
+    try {
+      const [weightRes, garminRes] = await Promise.all([
+        fetch('data/weight.json?v=' + Date.now()),
+        fetch('data/garmin.json?v='  + Date.now()),
+      ]);
+      const weight = await weightRes.json();
+      const garmin = await garminRes.json();
+      renderHealthCards(weight, garmin);
     } catch (e) {
-      // Silently fail — no weight data yet
+      console.log('Health data not available:', e);
     }
   }
-  loadWeight();
+
+  loadHealthData();
 
 </script>
 </body>
