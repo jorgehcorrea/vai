@@ -1,26 +1,26 @@
 {
-  "date": "2026-05-25",
+  "date": "2026-05-26",
   "user_summary": {},
   "sleep": {
-    "duration_seconds": null,
+    "duration_seconds": 25500,
     "score": null,
-    "deep_sleep_seconds": null,
-    "light_sleep_seconds": null,
-    "rem_sleep_seconds": null,
-    "awake_seconds": null,
-    "start_time_gmt": null,
-    "end_time_gmt": null
+    "deep_sleep_seconds": 2460,
+    "light_sleep_seconds": 14880,
+    "rem_sleep_seconds": 8160,
+    "awake_seconds": 480,
+    "start_time_gmt": 1779766260000,
+    "end_time_gmt": 1779792240000
   },
   "heart_rate": {},
   "last_activity": {
-    "type": "running",
-    "name": "Quito Carrera",
-    "distance_m": 5013.509765625,
-    "duration_seconds": 1867,
-    "avg_hr": 170.0,
-    "calories": 341.0,
-    "start_time_local": "2026-05-24 09:18:12"
+    "type": "indoor_cardio",
+    "name": "Cardio",
+    "distance_m": 0.0,
+    "duration_seconds": 664,
+    "avg_hr": 123.0,
+    "calories": 75.0,
+    "start_time_local": "2026-05-25 09:47:56"
   },
   "hrv": {},
-  "last_updated": "2026-05-25 14:50:04 UTC"
+  "last_updated": "2026-05-26 15:20:06 UTC"
 }

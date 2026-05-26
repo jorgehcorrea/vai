@@ -1,6 +1,24 @@
 {
-  "last_updated": "2026-05-25 14:50:04 UTC",
+  "last_updated": "2026-05-26 15:20:06 UTC",
   "runs": [
+    {
+      "date": "2026-05-25",
+      "activity_type": "indoor_cardio",
+      "distance_km": null,
+      "duration_seconds": 664,
+      "avg_hr": 123.0,
+      "avg_pace_min_km": null,
+      "calories": 75.0
+    },
+    {
+      "date": "2026-05-25",
+      "activity_type": "indoor_cardio",
+      "distance_km": null,
+      "duration_seconds": 640,
+      "avg_hr": 128.0,
+      "avg_pace_min_km": null,
+      "calories": 80.0
+    },
     {
       "date": "2026-05-24",
       "activity_type": "running",
@@ -93,6 +111,16 @@
     }
   ],
   "sleep": [
+    {
+      "date": "2026-05-26",
+      "duration_seconds": 25500,
+      "score": null,
+      "deep_sleep_seconds": 2460,
+      "light_sleep_seconds": 14880,
+      "rem_sleep_seconds": 8160,
+      "awake_seconds": 480,
+      "hrv_weekly_average": null
+    },
     {
       "date": "2026-05-24",
       "duration_seconds": 24600,
